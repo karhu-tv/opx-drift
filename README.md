@@ -20,12 +20,19 @@ Binary-only release. No source published.
 opx-drift file <media> [--stream <n>] [--rate <num>/<den>] [--json]
 opx-drift sync <media> [<media-b>] [--video-stream <n>] [--audio-stream <n>]
                [--rate <num>/<den>] [--json]
+opx-drift --version | -V
+opx-drift --help    | -h
 
 Exit codes:
   0  No discontinuities
   1  Discontinuities detected
   2  Error
 ```
+
+`--version` and `--help` are answered from any argument position, before the
+subcommand is read, so `opx-drift file clip.mp4 --version` reports the version
+rather than failing on a misplaced flag. (v0.2.0 had no `--version` at all;
+added in 0.2.1.)
 
 `file` — PTS deviation against the stream's own declared rate. The frame period is
 resolved as an exact rational and never floated, so the reported deviation is not
