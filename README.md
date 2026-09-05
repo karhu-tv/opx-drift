@@ -10,7 +10,8 @@ Binary-only release. No source published.
 
 | Platform | Requirements |
 |----------|-------------|
-| Linux x86_64 | Ubuntu 22.04+ · `sudo apt install ffmpeg` |
+| Linux x86_64 | Ubuntu 24.04 LTS · `sudo apt install ffmpeg` — FFmpeg 6.x, `libavformat.so.60`. 22.04 ships FFmpeg 4.4 and 26.04 ships FFmpeg 8; neither is supported. Other distributions need FFmpeg 6.x from their own sources |
+| Windows x86_64 | Windows 10 (tested Aug 2026) · FFmpeg DLLs bundled |
 
 ## What it answers
 
@@ -25,8 +26,8 @@ opx-drift --help    | -h
 
 Exit codes:
   0  No discontinuities
-  1  Discontinuities detected
-  2  Error
+  1  Discontinuities detected (in sync, also an R37 breach inside the file)
+  2  Error, too little data, or a VFR stream
 ```
 
 `--version` and `--help` are answered from any argument position, before the
@@ -60,11 +61,14 @@ opx-drift sync clip.mp4 && echo "OK" || echo "DRIFT"
 
 ## Sample output
 
+Captured 2026-09-06 with opx-drift 0.2.2 on a 10 s synthetic bars file (H.264 + stereo PCM),
+quoted verbatim. The earlier sample here had no surviving capture and was withdrawn.
+
 ```
-programme.mxf
-  video  slope +0.000 ppm vs its own declaration · 43093 pts · 718.9 s · max dev 0.00 ms · floor ±8.3 µs · SELF-CONSISTENT
-  audio  slope -1.412 ppm vs its own declaration · 33698 pts · 718.9 s · max dev 0.51 ms · floor ±10.4 µs
-  differential -1.412 ppm (+ = audio ahead) · guard 24.259 ppm (3× the 8.086 ppm slope floor)
+bars_h264_1080p25_stereo_10s.mp4
+  video  slope +0.000 ppm vs its own declaration · 250 pts · 10.0 s · max dev 0.00 ms · floor ±39.1 µs · SELF-CONSISTENT
+  audio  slope +0.000 ppm vs its own declaration · 470 pts · 10.0 s · max dev 0.00 ms · floor ±10.4 µs · SELF-CONSISTENT
+  no significant differential · differential +0.000 ppm (+ = audio ahead) · guard 14.836 ppm (3× the 4.945 ppm slope floor)
 ```
 
 ## Read this before quoting a number
@@ -74,8 +78,9 @@ declarations — is a coherent retime. It plays fast or slow but stays **in sync
 and it is not a sync fault. The differential is the finding. Judging absolute
 speed needs an external reference that a file does not carry.
 
-The quantisation floor is printed with every report. A deviation below it is not
-a measurement, and the tool says so rather than reporting a confident zero.
+The quantisation floor is printed with every report. A slope inside it is labelled
+quantisation-limited — `clean (quantisation-limited) · slope +0.000 ppm` — so a figure
+that small is never read as a measured zero.
 
 ---
 
