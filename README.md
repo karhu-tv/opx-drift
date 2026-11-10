@@ -10,13 +10,16 @@ Binary-only release. No source published.
 
 | Platform | Requirements |
 |----------|-------------|
-| Linux x86_64 | Ubuntu 24.04 LTS · `sudo apt install ffmpeg` — FFmpeg 6.x, `libavformat.so.60`. 22.04 ships FFmpeg 4.4 and 26.04 ships FFmpeg 8; neither is supported. Other distributions need FFmpeg 6.x from their own sources |
+| Linux x86_64 | 64-bit Linux with glibc 2.35 or later, as Ubuntu 22.04 and later have; tested on Ubuntu 24.04. FFmpeg is in the archive's `lib` folder: nothing to install |
+| Windows x86_64 | Tested on Windows 11. Keep the four FFmpeg DLLs beside `opx-drift.exe` |
 
-**Windows x86_64: withdrawn.** The Windows zips bundled FFmpeg 6.1.1 DLLs (gyan.dev full_build-shared), licensed GPL version 3 or later. The zips did not include that licence's text or an offer of the FFmpeg source, which the licence requires. Windows downloads withdrawn 29 Sep 2026 for this reason. The Linux build does not bundle FFmpeg.
+**Since 0.2.3, 10 Nov 2026, both downloads carry FFmpeg 6.1.6**, which we build ourselves, licensed LGPL version 2.1 or later; its source is on the release page. Each also carries the tool's licence (`LICENCE.txt`: free for any purpose, commercial included, no warranty) and the licences of the parts made by others.
 
-## Known issues in 0.2.2
+**Before 0.2.3:** the Windows zips (0.2.1 and 0.2.2) bundled FFmpeg 6.1.1 DLLs (gyan.dev full_build-shared), licensed GPL version 3 or later, without that licence's text or an offer of the FFmpeg source, which the licence requires; they were withdrawn on 29 Sep 2026 for this reason. The Linux archives linked the computer's own FFmpeg, which Ubuntu builds under the GPL, and no download carried a licence for the tool or for the Rust libraries in it.
 
-*Known issues added 29 Sep 2026.* These items are also listed on the [latest release](https://github.com/karhu-tv/opx-drift/releases/latest) and on [karhu.tv](https://karhu.tv/tools.html#opx-drift-issues).
+## Known issues in 0.2.2 and 0.2.3
+
+*Known issues added 29 Sep 2026.* 0.2.3 (10 Nov 2026) is 0.2.2's analysis: each applies to it too, but for the last two, which it fixes. These items are also listed on the [latest release](https://github.com/karhu-tv/opx-drift/releases/latest) and on [karhu.tv](https://karhu.tv/tools.html#opx-drift-issues).
 
 - **`sync` measures drift, not a constant offset.** Drift means a change in A/V alignment across the file. Each track is anchored at its own first packet, so a file whose audio is late by a fixed amount from the first frame reports no differential and exits 0. On 29 Sep 2026 a copy of our bars file with its audio 178 ms late passed. `opx-probe --house` flags such a file as a non-zero stream start (reported as an edit list).
 - **Dropped frames mid-file.** When dropped or repeated frames sit near the middle of a file, or are spread through it, the slope estimate absorbs them. The report then shows a slope the file does not have (roughly drops ÷ frames) and, on MPEG-TS and on some MP4s (25 fps in our tests), lists nearly every frame as a sub-period step. The ±1-period steps are still listed and the exit code is still 1. In `sync` the same slope appears as an A/V differential and can be reported as an EBU R37 crossing. On 29 Sep 2026 one dropped frame at the midpoint of a 500-frame 50p TS read +2066 ppm and 499 steps.
@@ -25,8 +28,8 @@ Binary-only release. No source published.
 - **Truncated files.** A truncated file is analysed as far as it goes and can read clean; the report does not say the file ended early.
 - **`--audio-stream`.** An index that is out of range or not audio falls back to video only, reports "no audio stream in this file", and exits 0.
 - **Exit code 101.** opx-drift ends in a Rust panic with exit code 101, outside the documented 0/1/2, when a file name is not valid UTF-8, and when stdout is closed before the report is written (for example `| head` on a long report).
-- **Publisher name.** `--help` names a limited company that is not the publisher, and the archive's README.txt runs the trading name together as one word. The publisher is Bear Media Services LTD, trading as Karhu TV. Both are fixed in source; the published archives are unchanged.
-- **Supported systems.** The README.txt inside the Linux archive says `sudo apt install ffmpeg (Ubuntu/Debian)`. No current Debian release ships FFmpeg 6; of Ubuntu releases, only 24.04 LTS is supported.
+- **Publisher name.** `--help` names a limited company that is not the publisher, and the archive's README.txt runs the trading name together as one word. The publisher is Bear Media Services LTD, trading as Karhu TV. Both are fixed in source; the published archives are unchanged. Fixed in 0.2.3, 10 Nov 2026.
+- **Supported systems.** The README.txt inside the Linux archive says `sudo apt install ffmpeg (Ubuntu/Debian)`. No current Debian release ships FFmpeg 6; of Ubuntu releases, only 24.04 LTS is supported. Since 0.2.3, 10 Nov 2026, the archive carries its own FFmpeg, and its README states what it needs.
 
 ## What it answers
 
